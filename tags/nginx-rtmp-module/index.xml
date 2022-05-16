@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Mitsuo Blog</title>
-    <link>https://masa-mitsu.github.io/blog/</link>
-    <description>Recent content on Mitsuo Blog</description>
+    <title>nginx-rtmp-module on Mitsuo Blog</title>
+    <link>https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/</link>
+    <description>Recent content in nginx-rtmp-module on Mitsuo Blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Mon, 16 May 2022 21:53:00 +0900</lastBuildDate><atom:link href="https://masa-mitsu.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 16 May 2022 21:53:00 +0900</lastBuildDate><atom:link href="https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Windowsでnginx-rtmp-moduleをビルドする (MinGW版)</title>
       <link>https://masa-mitsu.github.io/blog/posts/20220516_01/</link>
@@ -19,17 +19,6 @@ nginx-rtmp-module
 インストールが完了したら、pacman パッケージマネージャを利用し、以下ツール群をインストールします。
 pacman -S base-devel pacman -S mingw-w64-x86_64-toolchain pacman -S git pacman -S make pacman -S autoconf pacman -S automake 手順2. 必要なソースコード群の入手 以下のソースコード群を入手します。
  nginx (最新) zlib (最新) OpenSSL (v1.1.1o) PCRE (v8.5)  PCRE2ではコンパイルが通らなかった。 PCREはGitHubにソースがなく、SourceForgeでのみ入手可能である。 入手先: https://sourceforge.net/projects/pcre/   nginx-rtmp-module (最新)  # nginx git clone https://github.com/nginx/nginx.git --depth 1 -b release-1.</description>
-    </item>
-    
-    <item>
-      <title>初投稿</title>
-      <link>https://masa-mitsu.github.io/blog/posts/20220510_01/</link>
-      <pubDate>Tue, 10 May 2022 00:00:00 +0000</pubDate>
-      
-      <guid>https://masa-mitsu.github.io/blog/posts/20220510_01/</guid>
-      <description>初めまして。満尾 真章 (みつお まさあき) です。
-自分の好きな技術について記事を書くため、こちらのブログをセットアップしました。 頻度は少ないかもしれませんが、少しずつ記事を投稿しようと考えています。
-これから、よろしくお願いいたします。</description>
     </item>
     
   </channel>

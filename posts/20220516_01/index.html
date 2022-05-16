@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang='ja' dir='auto'><head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='最近、友人に勧められて始めた Splatoon 2 というゲームにハマっています。 私はゲーム部屋にこもってゲームをすることが多いのですが、宅内の他の部屋にゲームのプレイ画面を転送し表示できたら面白いなと思っていました。
+調査したところ、nginxをnginx-rtmp-moduleモジュール付きでビルドし、映像配信サーバーを立てることで、LAN内の他マシンと画面を共有できることが分かりました。 しかし、他記事等に掲載されているビルド手順がLinuxベースだったり、情報が古かったりしたため、最新のトライ記録をまとめておきたく、本記事を執筆しました。
+nginx-rtmp-module
+環境  Windows 10 コンパイル環境として MSYS2 &#43; MinGW を使用  手順1. MSYS環境のセットアップ MSYS公式サイトから、最新のインストーラーを入手し、インストールします。
+インストールが完了したら、pacman パッケージマネージャを利用し、以下ツール群をインストールします。
+pacman -S base-devel pacman -S mingw-w64-x86_64-toolchain pacman -S git pacman -S make pacman -S autoconf pacman -S automake 手順2. 必要なソースコード群の入手 以下のソースコード群を入手します。
+ nginx (最新) zlib (最新) OpenSSL (v1.1.1o) PCRE (v8.5)  PCRE2ではコンパイルが通らなかった。 PCREはGitHubにソースがなく、SourceForgeでのみ入手可能である。 入手先: https://sourceforge.net/projects/pcre/   nginx-rtmp-module (最新)  # nginx git clone https://github.com/nginx/nginx.git --depth 1 -b release-1.'>
+<meta name='theme-color' content='#ffcd00'>
+
+<meta property='og:title' content='Windowsでnginx-rtmp-moduleをビルドする (MinGW版) | Mitsuo Blog'>
+<meta property='og:description' content='最近、友人に勧められて始めた Splatoon 2 というゲームにハマっています。 私はゲーム部屋にこもってゲームをすることが多いのですが、宅内の他の部屋にゲームのプレイ画面を転送し表示できたら面白いなと思っていました。
+調査したところ、nginxをnginx-rtmp-moduleモジュール付きでビルドし、映像配信サーバーを立てることで、LAN内の他マシンと画面を共有できることが分かりました。 しかし、他記事等に掲載されているビルド手順がLinuxベースだったり、情報が古かったりしたため、最新のトライ記録をまとめておきたく、本記事を執筆しました。
+nginx-rtmp-module
+環境  Windows 10 コンパイル環境として MSYS2 &#43; MinGW を使用  手順1. MSYS環境のセットアップ MSYS公式サイトから、最新のインストーラーを入手し、インストールします。
+インストールが完了したら、pacman パッケージマネージャを利用し、以下ツール群をインストールします。
+pacman -S base-devel pacman -S mingw-w64-x86_64-toolchain pacman -S git pacman -S make pacman -S autoconf pacman -S automake 手順2. 必要なソースコード群の入手 以下のソースコード群を入手します。
+ nginx (最新) zlib (最新) OpenSSL (v1.1.1o) PCRE (v8.5)  PCRE2ではコンパイルが通らなかった。 PCREはGitHubにソースがなく、SourceForgeでのみ入手可能である。 入手先: https://sourceforge.net/projects/pcre/   nginx-rtmp-module (最新)  # nginx git clone https://github.com/nginx/nginx.git --depth 1 -b release-1.'>
+<meta property='og:url' content='https://masa-mitsu.github.io/blog/posts/20220516_01/'>
+<meta property='og:site_name' content='Mitsuo Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='posts'><meta property='article:tag' content='info'><meta property='article:tag' content='nginx'><meta property='article:tag' content='nginx-rtmp-module'><meta property='article:tag' content='rtmp'><meta property='article:tag' content='splatoon2'><meta property='article:published_time' content='2022-05-16T21:53:00&#43;09:00'/><meta property='article:modified_time' content='2022-05-16T21:53:00&#43;09:00'/><meta name='twitter:card' content='summary'>
+
+<meta name="generator" content="Hugo 0.98.0" />
+
+  <title>Windowsでnginx-rtmp-moduleをビルドする (MinGW版) | Mitsuo Blog</title>
+  <link rel='canonical' href='https://masa-mitsu.github.io/blog/posts/20220516_01/'>
+  
+  
+  <link rel='icon' href='https://masa-mitsu.github.io/blog/favicon.ico'>
+<link rel='stylesheet' href='https://masa-mitsu.github.io/blog/assets/css/main.ab98e12b.css'><link rel='stylesheet' href='https://masa-mitsu.github.io/blog/css/custom.css'><style>
+:root{--color-accent:#ffcd00;}
+</style>
+
+  
+
+</head>
+<body class='page type-posts has-sidebar'>
+
+  <div class='site'><div id='sidebar' class='sidebar'>
+  <a class='screen-reader-text' href='#main-menu'></a>
+
+  <div class='container'><section class='widget widget-about sep-after'>
+  <header>
+    
+    <div class='logo'>
+      <a href='https://masa-mitsu.github.io/blog/'>
+        <img src='https://masa-mitsu.github.io/blog/images/logo.png'>
+      </a>
+    </div>
+    
+    <h2 class='title site-title '>
+      <a href='https://masa-mitsu.github.io/blog/'>
+      Mitsuo Blog
+      </a>
+    </h2>
+    <div class='desc'>
+    技術者ブログ見習い
+    </div>
+  </header>
+
+</section>
+<section class='widget widget-taxonomy_cloud sep-after'>
+  <header>
+    <h4 class='title widget-title'>Tags</h4>
+  </header>
+
+  <div class='container list-container'>
+  <ul class='list taxonomy-cloud'><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/info/' style='font-size:2em'>info</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/nginx/' style='font-size:1em'>nginx</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/' style='font-size:1em'>nginx-rtmp-module</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/rtmp/' style='font-size:1em'>rtmp</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/splatoon2/' style='font-size:1em'>splatoon2</a>
+      </li></ul>
+</div>
+
+
+</section>
+</div>
+
+  <div class='sidebar-overlay'></div>
+</div><div class='main'><nav id='main-menu' class='menu main-menu' aria-label=''>
+  <div class='container'>
+    <a class='screen-reader-text' href='#content'></a>
+
+<button id='sidebar-toggler' class='sidebar-toggler' aria-controls='sidebar'>
+  <span class='screen-reader-text'></span>
+  <span class='open'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="3" y1="12" x2="21" y2="12" />
+<line x1="3" y1="6" x2="21" y2="6" />
+<line x1="3" y1="18" x2="21" y2="18" />
+</svg>
+</span>
+  <span class='close'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="18" y1="6" x2="6" y2="18" />
+<line x1="6" y1="6" x2="18" y2="18" />
+</svg>
+</span>
+</button>
+    <ul></ul>
+  </div>
+</nav><div class='header-widgets'>
+        <div class='container'>
+    
+    <style>.widget-breadcrumbs li:after{content:'\2f '}</style>
+  <section class='widget widget-breadcrumbs sep-after'>
+    <nav id='breadcrumbs'>
+      <ol><li><a href='https://masa-mitsu.github.io/blog/'>Mitsuo Blog</a></li><li><a href='https://masa-mitsu.github.io/blog/posts/'>Posts</a></li><li><span>Windowsでnginx-rtmp-moduleをビルドする (MinGW版)</span></li></ol>
+    </nav>
+  </section></div>
+      </div>
+
+      <header id='header' class='header site-header'>
+        <div class='container sep-after'>
+          <div class='header-info'><p class='site-title title'>Mitsuo Blog</p><p class='desc site-desc'>技術者ブログ見習い</p>
+          </div>
+        </div>
+      </header>
+
+      <main id='content'>
+
+
+<article lang='ja' class='entry'>
+  <header class='header entry-header'>
+  <div class='container sep-after'>
+    <div class='header-info'>
+      <h1 class='title'>Windowsでnginx-rtmp-moduleをビルドする (MinGW版)</h1>
+      
+
+    </div>
+    <div class='entry-meta'>
+  <span class='posted-on'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+<line x1="16" y1="2" x2="16" y2="6" />
+<line x1="8" y1="2" x2="8" y2="6" />
+<line x1="3" y1="10" x2="21" y2="10" />
+</svg>
+<span class='screen-reader-text'> </span>
+  <time class='entry-date' datetime='2022-05-16T21:53:00&#43;09:00'>2022/05/16</time>
+</span>
+
+  
+  
+<span class='reading-time'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><circle cx="12" cy="12" r="10" />
+<polyline points="12 6 12 12 15 15" />
+</svg>
+
+</span>
+
+
+</div>
+
+
+  </div>
+</header>
+
+  
+  
+
+  <div class='container entry-content'>
+  <p>最近、友人に勧められて始めた Splatoon 2 というゲームにハマっています。
+私はゲーム部屋にこもってゲームをすることが多いのですが、宅内の他の部屋にゲームのプレイ画面を転送し表示できたら面白いなと思っていました。</p>
+<p>調査したところ、nginxを<code>nginx-rtmp-module</code>モジュール付きでビルドし、映像配信サーバーを立てることで、LAN内の他マシンと画面を共有できることが分かりました。
+しかし、他記事等に掲載されているビルド手順がLinuxベースだったり、情報が古かったりしたため、最新のトライ記録をまとめておきたく、本記事を執筆しました。</p>
+<p><a href="https://github.com/arut/nginx-rtmp-module">nginx-rtmp-module</a></p>
+<h2 id="環境">環境</h2>
+<ul>
+<li>Windows 10</li>
+<li>コンパイル環境として MSYS2 + MinGW を使用</li>
+</ul>
+<h2 id="手順1-msys環境のセットアップ">手順1. MSYS環境のセットアップ</h2>
+<p><a href="https://www.msys2.org/">MSYS公式サイト</a>から、最新のインストーラーを入手し、インストールします。</p>
+<p>インストールが完了したら、pacman パッケージマネージャを利用し、以下ツール群をインストールします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>pacman -S base-devel
+</span></span><span style="display:flex;"><span>pacman -S mingw-w64-x86_64-toolchain
+</span></span><span style="display:flex;"><span>pacman -S git
+</span></span><span style="display:flex;"><span>pacman -S make
+</span></span><span style="display:flex;"><span>pacman -S autoconf
+</span></span><span style="display:flex;"><span>pacman -S automake
+</span></span></code></pre></div><h2 id="手順2-必要なソースコード群の入手">手順2. 必要なソースコード群の入手</h2>
+<p>以下のソースコード群を入手します。</p>
+<ul>
+<li>nginx (最新)</li>
+<li>zlib (最新)</li>
+<li>OpenSSL (v1.1.1o)</li>
+<li>PCRE (v8.5)
+<ul>
+<li>PCRE2ではコンパイルが通らなかった。</li>
+<li>PCREはGitHubにソースがなく、SourceForgeでのみ入手可能である。</li>
+<li>入手先: <a href="https://sourceforge.net/projects/pcre/">https://sourceforge.net/projects/pcre/</a></li>
+</ul>
+</li>
+<li>nginx-rtmp-module (最新)</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># nginx</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/nginx/nginx.git --depth <span style="color:#ae81ff">1</span> -b release-1.21.6
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># zlib</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/madler/zlib.git --depth <span style="color:#ae81ff">1</span> -b v1.2.12
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># OpenSSL (v1.1.1o)</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/openssl/openssl.git --depth <span style="color:#ae81ff">1</span> -b OpenSSL_1_1_1o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># PCRE</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># コマンドでは入手不可。ブラウザで以下のURLにアクセスし入手する。</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e">#   https://sourceforge.net/projects/pcre/</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># nginx-rtmp-module</span>
+</span></span><span style="display:flex;"><span>git clone https://github.com/arut/nginx-rtmp-module.git --depth <span style="color:#ae81ff">1</span> -b v1.2.2
+</span></span></code></pre></div><p>入手が完了したら、これらのディレクトリ群を、nginx ディレクトリの下へ、次のように配置します。</p>
+<pre tabindex="0"><code>nginx
+├ objs (新しくディレクトリを作成)
+│  └ lib (新しくディレクトリを作成)
+│      ├ nginx-rtmp-module
+│      ├ openssl
+│      ├ pcre
+│      └ zlib
+...
+</code></pre><h2 id="手順3-nginx-rtmp-module-のソースコード修正">手順3. nginx-rtmp-module のソースコード修正</h2>
+<p>そのままビルドしようとすると、エラーが発生しビルドが失敗します。次のように <code>nginx-rtmp-module</code> の <code>ngx_rtmp.h</code> を修正することで、エラーを回避できます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-diff" data-lang="diff"><span style="display:flex;"><span>diff --git a/ngx_rtmp.h b/ngx_rtmp.h
+</span></span><span style="display:flex;"><span>index cbe6a93..f3ee73d 100644
+</span></span><span style="display:flex;"><span><span style="color:#f92672">--- a/ngx_rtmp.h
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+++ b/ngx_rtmp.h
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span><span style="color:#75715e">@@ -19,7 +19,7 @@
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span> #if (NGX_WIN32)
+</span></span><span style="display:flex;"><span><span style="color:#f92672">-typedef __int8              int8_t;
+</span></span></span><span style="display:flex;"><span><span style="color:#f92672"></span><span style="color:#a6e22e">+// typedef __int8              int8_t;
+</span></span></span><span style="display:flex;"><span><span style="color:#a6e22e"></span> typedef unsigned __int8     uint8_t;
+</span></span><span style="display:flex;"><span> #endif
+</span></span></code></pre></div><h2 id="手順4-ビルド">手順4. ビルド</h2>
+<p>nginx を nginx-rtmp-module 付きでビルドします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># コマンド実行前に、カレントディレクトリが nginx であることを確認する。</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># configure</span>
+</span></span><span style="display:flex;"><span>auto/configure <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-cc<span style="color:#f92672">=</span>gcc <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-debug <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --builddir<span style="color:#f92672">=</span>objs <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --prefix<span style="color:#f92672">=</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --conf-path<span style="color:#f92672">=</span>conf/nginx.conf <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --pid-path<span style="color:#f92672">=</span>logs/nginx.pid <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --http-log-path<span style="color:#f92672">=</span>logs/access.log <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --error-log-path<span style="color:#f92672">=</span>logs/error.log <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --sbin-path<span style="color:#f92672">=</span>nginx.exe <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --http-client-body-temp-path<span style="color:#f92672">=</span>temp/client_body_temp <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --http-proxy-temp-path<span style="color:#f92672">=</span>temp/proxy_temp <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --http-fastcgi-temp-path<span style="color:#f92672">=</span>temp/fastcgi_temp <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --http-scgi-temp-path<span style="color:#f92672">=</span>temp/scgi_temp <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --http-uwsgi-temp-path<span style="color:#f92672">=</span>temp/uwsgi_temp <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-cc-opt<span style="color:#f92672">=</span>-DFD_SETSIZE<span style="color:#f92672">=</span><span style="color:#ae81ff">1024</span> <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-http_ssl_module <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-pcre<span style="color:#f92672">=</span>objs/lib/pcre <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-zlib<span style="color:#f92672">=</span>objs/lib/zlib <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-openssl<span style="color:#f92672">=</span>objs/lib/openssl <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --with-openssl-opt<span style="color:#f92672">=</span>no-asm <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span><span style="color:#ae81ff"></span>    --add-module<span style="color:#f92672">=</span>objs/lib/nginx-rtmp-module
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># build (PCのコア数に合わせて、スレッド数 (jの後ろの数字) を変更するとよい)</span>
+</span></span><span style="display:flex;"><span>make -f objs/Makefile -j4
+</span></span></code></pre></div><p>ビルドが完了すると、<code>nginx/objs</code> ディレクトリに <code>nginx.exe</code> が生成されています。</p>
+<h2 id="手順5-ビルド成果物の配置">手順5: ビルド成果物の配置</h2>
+<p>ビルド成果物等を、以下のようにディレクトリへ配置します。</p>
+<pre tabindex="0"><code>workDir
+ ├ nginx.exe (ビルド成果物)
+ ├ conf (nginxディレクトリからコピー)
+ ├ html (nginxディレクトリからコピー)
+ ├ logs (新規作成)
+ └ temp (新規作成)
+</code></pre><h2 id="手順6-コンフィグファイルの編集">手順6: コンフィグファイルの編集</h2>
+<p>映像配信はrtmpプロトコルで実施します。
+<code>workDir/conf/nginx.conf</code> の末尾へ、以下を追記します。</p>
+<pre tabindex="0"><code>rtmp {
+    server {
+        listen 1935;
+        chunk_size 8192;
+        application live {
+            live on;
+            record off;
+        }
+    }
+}
+</code></pre><p>なお、コンフィグの詳細説明については、<a href="https://github.com/arut/nginx-rtmp-module">nginx-rtmp-module 公式リポジトリ</a> の <a href="https://github.com/arut/nginx-rtmp-module#example-nginxconf">README</a> に記載されています。</p>
+<h2 id="接続図">接続図</h2>
+<p><img src="https://masa-mitsu.github.io/blog/posts/connection_figure.png" alt="接続図"></p>
+<p>当初は、OBSとnginxをPC1に配置し、PC2はVLCのみといった構成にしていたのですが、PC1の処理性能の問題か、映像がガクガクしてしまいました。nginxをPC2に移動させたら、安定して映像配信ができるようになりました。</p>
+<p>とはいえ、PC1/2とも、そんなにスペックは低くないはず（それぞれ第8世代/第11世代のCore i7ノートPC）なため、問題は処理性能でない可能性もあります。</p>
+<h2 id="今後検討したいこと">今後検討したいこと</h2>
+<h3 id="hls形式での映像配信">HLS形式での映像配信</h3>
+<p>正直なところ、 PC1からYouTubeに配信して、PC2で受信する構成でも良い気がしましたが、宅外に映像配信のトラフィックが出ないため、セキュリティ的に良い利点があるはずです。プロバイダから通信制限を掛けられるような問題も、この構成なら発生しにくいと思います。</p>
+<p>今回の例では、映像の送受信を全て rtmp プロトコルで実施していましたが、
+現在では配信部分に rtmp プロトコルを利用するケースがほとんどないようです。
+代わりに現在では HLS を利用しているようです。
+<code>nginx-rtmp-module</code> では HLS 形式もサポートされているようですので、
+近いうちに、勉強も兼ねて HLS 形式での配信も試してみたいです。</p>
+<p>ただし、<code>nginx-rtmp-module</code> は最近あまりメンテナンスがなされていない印象を受けるため、他に良い無料のメディアサーバがあれば試してみたい気持ちがあります。</p>
+<h2 id="参考サイト">参考サイト</h2>
+<ul>
+<li><a href="https://qiita.com/estima5633/items/0fe1013734bd727ca11a">https://qiita.com/estima5633/items/0fe1013734bd727ca11a</a>
+<ul>
+<li>ベースはほぼこちらのサイト通りです。</li>
+<li>MSVC 2010を使う必要があったり、Perl等のセットアップ作業が面倒だったり、といった点がネックだったので、より作業が楽になる方向で、ビルド手順を修正しました。</li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+  
+<footer class='entry-footer'>
+  <div class='container sep-before'><div class='tags'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z" />
+<line x1="7" y1="7" x2="7" y2="7" />
+</svg>
+<span class='screen-reader-text'>tags: </span><a class='tag' href='https://masa-mitsu.github.io/blog/tags/info/'>info</a>, <a class='tag' href='https://masa-mitsu.github.io/blog/tags/nginx/'>nginx</a>, <a class='tag' href='https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/'>nginx-rtmp-module</a>, <a class='tag' href='https://masa-mitsu.github.io/blog/tags/rtmp/'>rtmp</a>, <a class='tag' href='https://masa-mitsu.github.io/blog/tags/splatoon2/'>splatoon2</a></div>
+
+  </div>
+</footer>
+
+
+</article>
+
+<nav class='entry-nav'>
+  <div class='container'><div class='prev-entry sep-before'>
+      <a href='https://masa-mitsu.github.io/blog/posts/20220510_01/'>
+        <span aria-hidden='true'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="20" y1="12" x2="4" y2="12" />
+<polyline points="10 18 4 12 10 6" />
+</svg>
+ </span>
+        <span class='screen-reader-text'>: </span>初投稿</a>
+    </div></div>
+</nav>
+
+
+
+
+      </main>
+
+      <footer id='footer' class='footer'>
+        <div class='container sep-before'><section class='widget widget-social_menu sep-after'><nav aria-label=''>
+    <ul><li>
+        <a href='https://github.com/masa-mitsu' target='_blank' rel='noopener me'>
+          <span class='screen-reader-text'></span><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+</svg>
+</a>
+      </li></ul>
+  </nav>
+</section><div class='copyright'>
+  <p> &copy; 2022 Masaaki Mitsuo </p>
+</div>
+
+        </div>
+      </footer>
+
+    </div>
+  </div><script>window.__assets_js_src="https://masa-mitsu.github.io/blog/assets/js/"</script>
+
+<script src='https://masa-mitsu.github.io/blog/assets/js/main.c3bcf2df.js'></script><script src='https://masa-mitsu.github.io/blog/js/custom.js'></script>
+
+</body>
+
+</html>
+
