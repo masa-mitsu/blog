@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>argparse on Mitsuo Blog</title>
+    <link>https://masa-mitsu.github.io/blog/tags/argparse/</link>
+    <description>Recent content in argparse on Mitsuo Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <lastBuildDate>Thu, 21 Jul 2022 21:45:00 +0900</lastBuildDate><atom:link href="https://masa-mitsu.github.io/blog/tags/argparse/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>argparse の挙動メモ</title>
+      <link>https://masa-mitsu.github.io/blog/posts/20220721_01/</link>
+      <pubDate>Thu, 21 Jul 2022 21:45:00 +0900</pubDate>
+      
+      <guid>https://masa-mitsu.github.io/blog/posts/20220721_01/</guid>
+      <description>Python の argparse について、引数名が予約語と重なってしまった場合の挙動や、別名の指定方法について調べました。
+状況 Python スクリプトを、以下のようなコマンドライン引数とともに走らせる状況を考えます。
+python some_script.py --some-opt SOME_OPT --from FROM 通常であれば、以下のようなコードを書くことで、Python プログラム内でコマンドライン引数を読み出すことができます。
+# some_script.py from argparse import ArgumentParser  parser = ArgumentParser() parser.add_argument(&amp;#34;--some-opt&amp;#34;) parser.add_argument(&amp;#34;--from&amp;#34;) args = parser.parse_args()  # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
+# some_script.py (続き)  # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&amp;gt; SOME_OPT と出力される  # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&amp;gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang='ja' dir='auto'><head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='Python の argparse について、引数名が予約語と重なってしまった場合の挙動や、別名の指定方法について調べました。
+状況 Python スクリプトを、以下のようなコマンドライン引数とともに走らせる状況を考えます。
+python some_script.py --some-opt SOME_OPT --from FROM 通常であれば、以下のようなコードを書くことで、Python プログラム内でコマンドライン引数を読み出すことができます。
+# some_script.py from argparse import ArgumentParser  parser = ArgumentParser() parser.add_argument(&#34;--some-opt&#34;) parser.add_argument(&#34;--from&#34;) args = parser.parse_args()  # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
+# some_script.py (続き)  # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&gt; SOME_OPT と出力される  # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。'>
+<meta name='theme-color' content='#ffcd00'>
+
+<meta property='og:title' content='argparse の挙動メモ | Mitsuo Blog'>
+<meta property='og:description' content='Python の argparse について、引数名が予約語と重なってしまった場合の挙動や、別名の指定方法について調べました。
+状況 Python スクリプトを、以下のようなコマンドライン引数とともに走らせる状況を考えます。
+python some_script.py --some-opt SOME_OPT --from FROM 通常であれば、以下のようなコードを書くことで、Python プログラム内でコマンドライン引数を読み出すことができます。
+# some_script.py from argparse import ArgumentParser  parser = ArgumentParser() parser.add_argument(&#34;--some-opt&#34;) parser.add_argument(&#34;--from&#34;) args = parser.parse_args()  # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
+# some_script.py (続き)  # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&gt; SOME_OPT と出力される  # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。'>
+<meta property='og:url' content='https://masa-mitsu.github.io/blog/posts/20220721_01/'>
+<meta property='og:site_name' content='Mitsuo Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='posts'><meta property='article:tag' content='python'><meta property='article:tag' content='argparse'><meta property='article:published_time' content='2022-07-21T21:45:00&#43;09:00'/><meta property='article:modified_time' content='2022-07-21T21:45:00&#43;09:00'/><meta name='twitter:card' content='summary'>
+
+<meta name="generator" content="Hugo 0.98.0" />
+
+  <title>argparse の挙動メモ | Mitsuo Blog</title>
+  <link rel='canonical' href='https://masa-mitsu.github.io/blog/posts/20220721_01/'>
+  
+  
+  <link rel='icon' href='https://masa-mitsu.github.io/blog/favicon.ico'>
+<link rel='stylesheet' href='https://masa-mitsu.github.io/blog/assets/css/main.ab98e12b.css'><link rel='stylesheet' href='https://masa-mitsu.github.io/blog/css/custom.css'><style>
+:root{--color-accent:#ffcd00;}
+</style>
+
+  
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EFPVEL1QC2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EFPVEL1QC2');
+</script>
+</head>
+<body class='page type-posts has-sidebar'>
+
+  <div class='site'><div id='sidebar' class='sidebar'>
+  <a class='screen-reader-text' href='#main-menu'></a>
+
+  <div class='container'><section class='widget widget-about sep-after'>
+  <header>
+    
+    <div class='logo'>
+      <a href='https://masa-mitsu.github.io/blog/'>
+        <img src='https://masa-mitsu.github.io/blog/images/logo.png'>
+      </a>
+    </div>
+    
+    <h2 class='title site-title '>
+      <a href='https://masa-mitsu.github.io/blog/'>
+      Mitsuo Blog
+      </a>
+    </h2>
+    <div class='desc'>
+    技術者ブログ見習い
+    </div>
+  </header>
+
+</section>
+<section class='widget widget-taxonomy_cloud sep-after'>
+  <header>
+    <h4 class='title widget-title'>Tags</h4>
+  </header>
+
+  <div class='container list-container'>
+  <ul class='list taxonomy-cloud'><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/argparse/' style='font-size:1em'>argparse</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/info/' style='font-size:2em'>info</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/nginx/' style='font-size:1em'>nginx</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/' style='font-size:1em'>nginx-rtmp-module</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/python/' style='font-size:1em'>python</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/rtmp/' style='font-size:1em'>rtmp</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/splatoon2/' style='font-size:1em'>splatoon2</a>
+      </li></ul>
+</div>
+
+
+</section>
+</div>
+
+  <div class='sidebar-overlay'></div>
+</div><div class='main'><nav id='main-menu' class='menu main-menu' aria-label=''>
+  <div class='container'>
+    <a class='screen-reader-text' href='#content'></a>
+
+<button id='sidebar-toggler' class='sidebar-toggler' aria-controls='sidebar'>
+  <span class='screen-reader-text'></span>
+  <span class='open'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="3" y1="12" x2="21" y2="12" />
+<line x1="3" y1="6" x2="21" y2="6" />
+<line x1="3" y1="18" x2="21" y2="18" />
+</svg>
+</span>
+  <span class='close'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="18" y1="6" x2="6" y2="18" />
+<line x1="6" y1="6" x2="18" y2="18" />
+</svg>
+</span>
+</button>
+    <ul></ul>
+  </div>
+</nav><div class='header-widgets'>
+        <div class='container'>
+    
+    <style>.widget-breadcrumbs li:after{content:'\2f '}</style>
+  <section class='widget widget-breadcrumbs sep-after'>
+    <nav id='breadcrumbs'>
+      <ol><li><a href='https://masa-mitsu.github.io/blog/'>Mitsuo Blog</a></li><li><a href='https://masa-mitsu.github.io/blog/posts/'>Posts</a></li><li><span>argparse の挙動メモ</span></li></ol>
+    </nav>
+  </section></div>
+      </div>
+
+      <header id='header' class='header site-header'>
+        <div class='container sep-after'>
+          <div class='header-info'><p class='site-title title'>Mitsuo Blog</p><p class='desc site-desc'>技術者ブログ見習い</p>
+          </div>
+        </div>
+      </header>
+
+      <main id='content'>
+
+
+<article lang='ja' class='entry'>
+  <header class='header entry-header'>
+  <div class='container sep-after'>
+    <div class='header-info'>
+      <h1 class='title'>argparse の挙動メモ</h1>
+      
+
+    </div>
+    <div class='entry-meta'>
+  <span class='posted-on'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+<line x1="16" y1="2" x2="16" y2="6" />
+<line x1="8" y1="2" x2="8" y2="6" />
+<line x1="3" y1="10" x2="21" y2="10" />
+</svg>
+<span class='screen-reader-text'> </span>
+  <time class='entry-date' datetime='2022-07-21T21:45:00&#43;09:00'>2022/07/21</time>
+</span>
+
+  
+  
+<span class='reading-time'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><circle cx="12" cy="12" r="10" />
+<polyline points="12 6 12 12 15 15" />
+</svg>
+
+</span>
+
+
+</div>
+
+
+  </div>
+</header>
+
+  
+  
+
+  <div class='container entry-content'>
+  <p>Python の <code>argparse</code> について、引数名が予約語と重なってしまった場合の挙動や、別名の指定方法について調べました。</p>
+<h2 id="状況">状況</h2>
+<p>Python スクリプトを、以下のようなコマンドライン引数とともに走らせる状況を考えます。</p>
+<pre tabindex="0"><code>python some_script.py --some-opt SOME_OPT --from FROM
+</code></pre><p>通常であれば、以下のようなコードを書くことで、Python プログラム内でコマンドライン引数を読み出すことができます。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># some_script.py</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> argparse <span style="color:#f92672">import</span> ArgumentParser
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>parser <span style="color:#f92672">=</span> ArgumentParser()
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--some-opt&#34;</span>)
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--from&#34;</span>)
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># args.some_opt と指定すると、コマンドライン引数 --some-opt の</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 指定値を読み取ることができる</span>
+</span></span></code></pre></div><p>しかし、<code>from</code> は Python の予約語です。
+したがって、<code>args.from</code> では <code>--from</code> で指定した値を読み出せず、エラーとなります。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># some_script.py (続き)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 通常であれば、以下のように --some-opt で指定した値を読み出せる。</span>
+</span></span><span style="display:flex;"><span>print(args<span style="color:#f92672">.</span>some_opt)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -&gt; SOME_OPT と出力される</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># しかし、引数名が予約語と重複した場合には、値を読み出せない。</span>
+</span></span><span style="display:flex;"><span>print(args<span style="color:#f92672">.</span>from)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -&gt; SyntaxError: invalid syntax</span>
+</span></span></code></pre></div><h2 id="解決方針">解決方針</h2>
+<p>次の方針で、この問題を解決したいです。</p>
+<ul>
+<li>コマンドライン引数名である <code>--from</code> は変えない。</li>
+<li>ソースコード側の呼び出し方は変えてもよい。</li>
+</ul>
+<h2 id="結論">結論</h2>
+<p>結論から述べると、<code>add_argument()</code> 関数に <code>dest</code> オプションを付与し、
+別名で読み出せるようにすれば OK です。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># some_script.py (rev.02)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> argparse <span style="color:#f92672">import</span> ArgumentParser
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>parser <span style="color:#f92672">=</span> ArgumentParser()
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--some-opt&#34;</span>)
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--from&#34;</span>, dest<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;alt_name&#34;</span>)    <span style="color:#75715e"># dest で、パース後の属性名を指定する</span>
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># args.alt_name を呼び出すことで、--from で指定した値を読み出せる</span>
+</span></span><span style="display:flex;"><span>print(args<span style="color:#f92672">.</span>alt_name)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -&gt; FROM と出力される</span>
+</span></span></code></pre></div><p>詳細については、argparse のドキュメントに記載されています。</p>
+<blockquote>
+<p>dest - parse_args() が返すオブジェクトに追加される属性名。</p>
+</blockquote>
+<p><a href="https://docs.python.org/ja/3/library/argparse.html#argparse.ArgumentParser.add_argument">https://docs.python.org/ja/3/library/argparse.html#argparse.ArgumentParser.add_argument</a></p>
+<hr>
+<h2 id="試行錯誤した記録">試行錯誤した記録</h2>
+<p>以下、<code>dest</code> を見つけるまでに試行錯誤した記録も残しておきます。</p>
+<p><code>ArgumentParser</code> の <code>add_argument()</code> では、複数の引数名を指定でき、主に引数の省略形を登録する目的で利用されています。
+たとえば、<code>--opt1</code> の省略形として <code>-O</code> を登録する場合、以下のようにします。コマンドライン引数を読み出す時は、正式な引数名である <code>args.opt1</code> を利用します。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># -O OPT1, --opt1 OPT1 の両方を受け入れることができる。</span>
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;-O&#34;</span>, <span style="color:#e6db74">&#34;--opt1&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 値を読み出す際は、ハイフン2個の指定 (正式名) が優先される</span>
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span>print(args<span style="color:#f92672">.</span>opt1)    <span style="color:#75715e"># -&gt; OPT1 と出力される</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># ハイフン1個の名前 (省略形) では読み出せない</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># print(args.O)     # -&gt; エラーとなり出力されない</span>
+</span></span></code></pre></div><p>ここで、引数名の指定は「正式名 (ハイフン2個) + 省略形 (ハイフン1個)」のみでなく、「正式名 (ハイフン2個) + 別名 (ハイフン2個)」でも可能です。
+ハイフン2個の名前が複数登録されている場合、最初に指定されている名前が正式名となり、それ以降に指定されている名前は別名となります。
+コマンドライン引数は、正式名でのみ読み出すことができ、別名で読み出すことはできません。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># --opt1 OPT1 と、--alt-opt1 OPT1 を両方受け入れできる。</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 引数の読み出しは、正式名の args.opt1 のみ可能で、</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 別名の args.alt_opt1 ではエラーとなる</span>
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--opt1&#34;</span>, <span style="color:#e6db74">&#34;--alt-opt1&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -O OPT1 と、--opt1 OPT1 と、--alt-opt1 OPT1 と、</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># --altalt-opt1 OPT1 をすべて受け入れできる。</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 引数の読み出しは、正式名の args.opt1 でのみ可能で、</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># 省略形の args.O や、別名の args.alt_opt1 / args.altalt_opt1 では</span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># エラーとなる</span>
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;-O&#34;</span>, <span style="color:#e6db74">&#34;--opt1&#34;</span>, <span style="color:#e6db74">&#34;--alt-opt1&#34;</span>, <span style="color:#e6db74">&#34;--altalt-opt1&#34;</span>)
+</span></span></code></pre></div><p>つまり、 <code>--alt-name</code> が正式名になり、<code>--from</code> が別名になるよう引数名を登録すれば、コマンドラインで <code>--from FROM</code> と指定した引数を、<code>args.alt_name</code> として読み出せます。
+以下コードのように、<code>--alt-name</code> → <code>--from</code> の順で <code>add_argument()</code> をコールします。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># some_script.py (rev.01a)</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> argparse <span style="color:#f92672">import</span> ArgumentParser
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>parser <span style="color:#f92672">=</span> ArgumentParser()
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--some-opt&#34;</span>)
+</span></span><span style="display:flex;"><span>parser<span style="color:#f92672">.</span>add_argument(<span style="color:#e6db74">&#34;--alt_name&#34;</span>, <span style="color:#e6db74">&#34;--from&#34;</span>)
+</span></span><span style="display:flex;"><span>args <span style="color:#f92672">=</span> parser<span style="color:#f92672">.</span>parse_args()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># args.alt_name を呼び出すことで、--from で指定した値を読み出せる</span>
+</span></span><span style="display:flex;"><span>print(args<span style="color:#f92672">.</span>alt_name)
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># -&gt; FROM と出力される</span>
+</span></span></code></pre></div><p>ただし、上のような指定方法は、特に「正式名」「別名」「省略形」の3つが絡むような場合に、少し複雑だと思います。
+他の解決策はないものかとargparseの<a href="https://docs.python.org/ja/3/library/argparse.html">ドキュメント</a>を読んでいたところ、より直感的で直接的な<a href="https://docs.python.org/ja/3/library/argparse.html#dest"> <code>dest</code> を用いる方法</a>を見つけました。
+ドキュメンテーションを読むのは大事ですね。</p>
+
+</div>
+
+  
+<footer class='entry-footer'>
+  <div class='container sep-before'><div class='tags'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z" />
+<line x1="7" y1="7" x2="7" y2="7" />
+</svg>
+<span class='screen-reader-text'>tags: </span><a class='tag' href='https://masa-mitsu.github.io/blog/tags/python/'>python</a>, <a class='tag' href='https://masa-mitsu.github.io/blog/tags/argparse/'>argparse</a></div>
+
+  </div>
+</footer>
+
+
+</article>
+
+<nav class='entry-nav'>
+  <div class='container'><div class='prev-entry sep-before'>
+      <a href='https://masa-mitsu.github.io/blog/posts/20220516_01/'>
+        <span aria-hidden='true'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="20" y1="12" x2="4" y2="12" />
+<polyline points="10 18 4 12 10 6" />
+</svg>
+ </span>
+        <span class='screen-reader-text'>: </span>Windowsでnginx-rtmp-moduleをビルドする (MinGW版)</a>
+    </div></div>
+</nav>
+
+
+
+
+      </main>
+
+      <footer id='footer' class='footer'>
+        <div class='container sep-before'><section class='widget widget-social_menu sep-after'><nav aria-label=''>
+    <ul><li>
+        <a href='https://github.com/masa-mitsu' target='_blank' rel='noopener me'>
+          <span class='screen-reader-text'></span><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+</svg>
+</a>
+      </li><li>
+        <a href='https://twitter.com/MasaakiMitsuo' target='_blank' rel='noopener me'>
+          <span class='screen-reader-text'></span><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+</svg>
+</a>
+      </li></ul>
+  </nav>
+</section><div class='copyright'>
+  <p> &copy; 2022 Masaaki Mitsuo </p>
+</div>
+
+        </div>
+      </footer>
+
+    </div>
+  </div><script>window.__assets_js_src="https://masa-mitsu.github.io/blog/assets/js/"</script>
+
+<script src='https://masa-mitsu.github.io/blog/assets/js/main.c3bcf2df.js'></script><script src='https://masa-mitsu.github.io/blog/js/custom.js'></script>
+
+</body>
+
+</html>
+

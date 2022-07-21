@@ -2,10 +2,25 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://masa-mitsu.github.io/blog/tags/info/</loc>
-    <lastmod>2022-05-16T21:53:00+09:00</lastmod>
+    <loc>https://masa-mitsu.github.io/blog/tags/argparse/</loc>
+    <lastmod>2022-07-21T21:45:00+09:00</lastmod>
+  </url><url>
+    <loc>https://masa-mitsu.github.io/blog/posts/20220721_01/</loc>
+    <lastmod>2022-07-21T21:45:00+09:00</lastmod>
   </url><url>
     <loc>https://masa-mitsu.github.io/blog/</loc>
+    <lastmod>2022-07-21T21:45:00+09:00</lastmod>
+  </url><url>
+    <loc>https://masa-mitsu.github.io/blog/posts/</loc>
+    <lastmod>2022-07-21T21:45:00+09:00</lastmod>
+  </url><url>
+    <loc>https://masa-mitsu.github.io/blog/tags/python/</loc>
+    <lastmod>2022-07-21T21:45:00+09:00</lastmod>
+  </url><url>
+    <loc>https://masa-mitsu.github.io/blog/tags/</loc>
+    <lastmod>2022-07-21T21:45:00+09:00</lastmod>
+  </url><url>
+    <loc>https://masa-mitsu.github.io/blog/tags/info/</loc>
     <lastmod>2022-05-16T21:53:00+09:00</lastmod>
   </url><url>
     <loc>https://masa-mitsu.github.io/blog/tags/nginx/</loc>
@@ -14,16 +29,10 @@
     <loc>https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/</loc>
     <lastmod>2022-05-16T21:53:00+09:00</lastmod>
   </url><url>
-    <loc>https://masa-mitsu.github.io/blog/posts/</loc>
-    <lastmod>2022-05-16T21:53:00+09:00</lastmod>
-  </url><url>
     <loc>https://masa-mitsu.github.io/blog/tags/rtmp/</loc>
     <lastmod>2022-05-16T21:53:00+09:00</lastmod>
   </url><url>
     <loc>https://masa-mitsu.github.io/blog/tags/splatoon2/</loc>
-    <lastmod>2022-05-16T21:53:00+09:00</lastmod>
-  </url><url>
-    <loc>https://masa-mitsu.github.io/blog/tags/</loc>
     <lastmod>2022-05-16T21:53:00+09:00</lastmod>
   </url><url>
     <loc>https://masa-mitsu.github.io/blog/posts/20220516_01/</loc>
