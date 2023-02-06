@@ -5,7 +5,21 @@
     <link>https://masa-mitsu.github.io/blog/</link>
     <description>Recent content on Mitsuo Blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <lastBuildDate>Thu, 21 Jul 2022 21:45:00 +0900</lastBuildDate><atom:link href="https://masa-mitsu.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 06 Feb 2023 23:18:00 +0900</lastBuildDate><atom:link href="https://masa-mitsu.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>[競プロ] 再帰の実装をミスった記録</title>
+      <link>https://masa-mitsu.github.io/blog/posts/20230206_01/</link>
+      <pubDate>Mon, 06 Feb 2023 23:18:00 +0900</pubDate>
+      
+      <guid>https://masa-mitsu.github.io/blog/posts/20230206_01/</guid>
+      <description>最近では、競技プログラミングに取り組んでいます。 昨年8月から継続的に AtCoder Beginner Contest に参加しており、レーティングは最高1263 (水色) です。 https://atcoder.jp/users/masa_mitsu
+競技プログラミングに取り組む中で、様々な気づきがありました。 しょうもない内容ではありますが、（特に自身がやらかしたミスを中心に）少しずつ気づきを言語化し、本ページに蓄えていきたいと思います。
+計算量 O(log N) にできたつもりが、実際は O(N) だった ARC151-B (A &amp;lt; AP) を解く中でやらかしたミスです。 https://atcoder.jp/contests/arc151/tasks/arc151_b
+この問題では、高速に「ある整数 M の N 乗を、MOD (= 998244353) で割った余り」を求める必要がありました。 何も考えずに、次のように実装したところ、TLE が帰ってきました。
+実装完了時点では、「Mpow() 関数を1回呼び出すたびに、npow が約半分になっているので、計算量は O(log N) になっているはず！」と思い込んでいました。
+typedef long long int ll; const ll MOD = 998244353;  ll Mpow(ll M, ll npow) {  if (npow == 0) return 1;  if (npow == 1) return M % MOD;  return ((Mpow(M, npow/2) % MOD)  * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。</description>
+    </item>
+    
     <item>
       <title>argparse の挙動メモ</title>
       <link>https://masa-mitsu.github.io/blog/posts/20220721_01/</link>
