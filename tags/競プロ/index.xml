@@ -17,7 +17,7 @@
 計算量 O(log N) にできたつもりが、実際は O(N) だった ARC151-B (A &amp;lt; AP) を解く中でやらかしたミスです。 https://atcoder.jp/contests/arc151/tasks/arc151_b
 この問題では、高速に「ある整数 M の N 乗を、MOD (= 998244353) で割った余り」を求める必要がありました。 何も考えずに、次のように実装したところ、TLE が帰ってきました。
 実装完了時点では、「Mpow() 関数を1回呼び出すたびに、npow が約半分になっているので、計算量は O(log N) になっているはず！」と思い込んでいました。
-typedef long long int ll; const ll MOD = 998244353;  ll Mpow(ll M, ll npow) {  if (npow == 0) return 1;  if (npow == 1) return M % MOD;  return ((Mpow(M, npow/2) % MOD)  * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。</description>
+typedef long long int ll; const ll MOD = 998244353; ll Mpow(ll M, ll npow) { if (npow == 0) return 1; if (npow == 1) return M % MOD; return ((Mpow(M, npow/2) % MOD) * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。</description>
     </item>
     
   </channel>

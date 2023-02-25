@@ -15,10 +15,10 @@
       <description>最近、友人に勧められて始めた Splatoon 2 というゲームにハマっています。 私はゲーム部屋にこもってゲームをすることが多いのですが、宅内の他の部屋にゲームのプレイ画面を転送し表示できたら面白いなと思っていました。
 調査したところ、nginxをnginx-rtmp-moduleモジュール付きでビルドし、映像配信サーバーを立てることで、LAN内の他マシンと画面を共有できることが分かりました。 しかし、他記事等に掲載されているビルド手順がLinuxベースだったり、情報が古かったりしたため、最新のトライ記録をまとめておきたく、本記事を執筆しました。
 nginx-rtmp-module
-環境  Windows 10 コンパイル環境として MSYS2 + MinGW を使用  手順1. MSYS環境のセットアップ MSYS公式サイトから、最新のインストーラーを入手し、インストールします。
+環境 Windows 10 コンパイル環境として MSYS2 + MinGW を使用 手順1. MSYS環境のセットアップ MSYS公式サイトから、最新のインストーラーを入手し、インストールします。
 インストールが完了したら、pacman パッケージマネージャを利用し、以下ツール群をインストールします。
 pacman -S base-devel pacman -S mingw-w64-x86_64-toolchain pacman -S git pacman -S make pacman -S autoconf pacman -S automake 手順2. 必要なソースコード群の入手 以下のソースコード群を入手します。
- nginx (最新) zlib (最新) OpenSSL (v1.1.1o) PCRE (v8.5)  PCRE2ではコンパイルが通らなかった。 PCREはGitHubにソースがなく、SourceForgeでのみ入手可能である。 入手先: https://sourceforge.net/projects/pcre/   nginx-rtmp-module (最新)  # nginx git clone https://github.com/nginx/nginx.git --depth 1 -b release-1.</description>
+nginx (最新) zlib (最新) OpenSSL (v1.1.1o) PCRE (v8.5) PCRE2ではコンパイルが通らなかった。 PCREはGitHubにソースがなく、SourceForgeでのみ入手可能である。 入手先: https://sourceforge.net/projects/pcre/ nginx-rtmp-module (最新) # nginx git clone https://github.com/nginx/nginx.git --depth 1 -b release-1.21.6 # zlib git clone https://github.com/madler/zlib.git --depth 1 -b v1.</description>
     </item>
     
     <item>

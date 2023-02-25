@@ -7,7 +7,7 @@
 計算量 O(log N) にできたつもりが、実際は O(N) だった ARC151-B (A &lt; AP) を解く中でやらかしたミスです。 https://atcoder.jp/contests/arc151/tasks/arc151_b
 この問題では、高速に「ある整数 M の N 乗を、MOD (= 998244353) で割った余り」を求める必要がありました。 何も考えずに、次のように実装したところ、TLE が帰ってきました。
 実装完了時点では、「Mpow() 関数を1回呼び出すたびに、npow が約半分になっているので、計算量は O(log N) になっているはず！」と思い込んでいました。
-typedef long long int ll; const ll MOD = 998244353;  ll Mpow(ll M, ll npow) {  if (npow == 0) return 1;  if (npow == 1) return M % MOD;  return ((Mpow(M, npow/2) % MOD)  * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。'>
+typedef long long int ll; const ll MOD = 998244353; ll Mpow(ll M, ll npow) { if (npow == 0) return 1; if (npow == 1) return M % MOD; return ((Mpow(M, npow/2) % MOD) * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。'>
 <meta name='theme-color' content='#ffcd00'>
 
 <meta property='og:title' content='[競プロ] 再帰の実装をミスった記録 | Mitsuo Blog'>
@@ -16,12 +16,12 @@ typedef long long int ll; const ll MOD = 998244353;  ll Mpow(ll M, ll npow) {  i
 計算量 O(log N) にできたつもりが、実際は O(N) だった ARC151-B (A &lt; AP) を解く中でやらかしたミスです。 https://atcoder.jp/contests/arc151/tasks/arc151_b
 この問題では、高速に「ある整数 M の N 乗を、MOD (= 998244353) で割った余り」を求める必要がありました。 何も考えずに、次のように実装したところ、TLE が帰ってきました。
 実装完了時点では、「Mpow() 関数を1回呼び出すたびに、npow が約半分になっているので、計算量は O(log N) になっているはず！」と思い込んでいました。
-typedef long long int ll; const ll MOD = 998244353;  ll Mpow(ll M, ll npow) {  if (npow == 0) return 1;  if (npow == 1) return M % MOD;  return ((Mpow(M, npow/2) % MOD)  * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。'>
+typedef long long int ll; const ll MOD = 998244353; ll Mpow(ll M, ll npow) { if (npow == 0) return 1; if (npow == 1) return M % MOD; return ((Mpow(M, npow/2) % MOD) * (Mpow(M, npow-npow/2) % MOD)) % MOD; } 残念ながら、この実装は計算量 O(N) になります。例えば npow = 100 のとき、Mpow() の総呼び出し回数は 199 です。npow = 200 にすると 399 回に増えます。 Mpow() を1回呼び出すと、n_pow はおよそ半分になるものの、その後 Mpow() 関数の呼び出しが2回生じるため、です。'>
 <meta property='og:url' content='https://masa-mitsu.github.io/blog/posts/20230206_01/'>
 <meta property='og:site_name' content='Mitsuo Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='posts'><meta property='article:tag' content='競プロ'><meta property='article:tag' content='再帰'><meta property='article:published_time' content='2023-02-06T23:18:00&#43;09:00'/><meta property='article:modified_time' content='2023-02-06T23:18:00&#43;09:00'/><meta name='twitter:card' content='summary'>
 
-<meta name="generator" content="Hugo 0.98.0" />
+<meta name="generator" content="Hugo 0.110.0">
 
   <title>[競プロ] 再帰の実装をミスった記録 | Mitsuo Blog</title>
   <link rel='canonical' href='https://masa-mitsu.github.io/blog/posts/20230206_01/'>

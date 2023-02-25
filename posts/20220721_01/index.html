@@ -5,21 +5,23 @@
 <meta name='description' content='Python の argparse について、引数名が予約語と重なってしまった場合の挙動や、別名の指定方法について調べました。
 状況 Python スクリプトを、以下のようなコマンドライン引数とともに走らせる状況を考えます。
 python some_script.py --some-opt SOME_OPT --from FROM 通常であれば、以下のようなコードを書くことで、Python プログラム内でコマンドライン引数を読み出すことができます。
-# some_script.py from argparse import ArgumentParser  parser = ArgumentParser() parser.add_argument(&#34;--some-opt&#34;) parser.add_argument(&#34;--from&#34;) args = parser.parse_args()  # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
-# some_script.py (続き)  # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&gt; SOME_OPT と出力される  # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。'>
+# some_script.py from argparse import ArgumentParser parser = ArgumentParser() parser.add_argument(&#34;--some-opt&#34;) parser.add_argument(&#34;--from&#34;) args = parser.parse_args() # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
+# some_script.py (続き) # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&gt; SOME_OPT と出力される # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。
+コマンドライン引数名である --from は変えない。 ソースコード側の呼び出し方は変えてもよい。 結論 結論から述べると、add_argument() 関数に dest オプションを付与し、 別名で読み出せるようにすれば OK です。'>
 <meta name='theme-color' content='#ffcd00'>
 
 <meta property='og:title' content='argparse の挙動メモ | Mitsuo Blog'>
 <meta property='og:description' content='Python の argparse について、引数名が予約語と重なってしまった場合の挙動や、別名の指定方法について調べました。
 状況 Python スクリプトを、以下のようなコマンドライン引数とともに走らせる状況を考えます。
 python some_script.py --some-opt SOME_OPT --from FROM 通常であれば、以下のようなコードを書くことで、Python プログラム内でコマンドライン引数を読み出すことができます。
-# some_script.py from argparse import ArgumentParser  parser = ArgumentParser() parser.add_argument(&#34;--some-opt&#34;) parser.add_argument(&#34;--from&#34;) args = parser.parse_args()  # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
-# some_script.py (続き)  # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&gt; SOME_OPT と出力される  # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。'>
+# some_script.py from argparse import ArgumentParser parser = ArgumentParser() parser.add_argument(&#34;--some-opt&#34;) parser.add_argument(&#34;--from&#34;) args = parser.parse_args() # args.some_opt と指定すると、コマンドライン引数 --some-opt の # 指定値を読み取ることができる しかし、from は Python の予約語です。 したがって、args.from では --from で指定した値を読み出せず、エラーとなります。
+# some_script.py (続き) # 通常であれば、以下のように --some-opt で指定した値を読み出せる。 print(args.some_opt) # -&gt; SOME_OPT と出力される # しかし、引数名が予約語と重複した場合には、値を読み出せない。 print(args.from) # -&gt; SyntaxError: invalid syntax 解決方針 次の方針で、この問題を解決したいです。
+コマンドライン引数名である --from は変えない。 ソースコード側の呼び出し方は変えてもよい。 結論 結論から述べると、add_argument() 関数に dest オプションを付与し、 別名で読み出せるようにすれば OK です。'>
 <meta property='og:url' content='https://masa-mitsu.github.io/blog/posts/20220721_01/'>
 <meta property='og:site_name' content='Mitsuo Blog'>
 <meta property='og:type' content='article'><meta property='article:section' content='posts'><meta property='article:tag' content='python'><meta property='article:tag' content='argparse'><meta property='article:published_time' content='2022-07-21T21:45:00&#43;09:00'/><meta property='article:modified_time' content='2022-07-21T21:45:00&#43;09:00'/><meta name='twitter:card' content='summary'>
 
-<meta name="generator" content="Hugo 0.98.0" />
+<meta name="generator" content="Hugo 0.110.0">
 
   <title>argparse の挙動メモ | Mitsuo Blog</title>
   <link rel='canonical' href='https://masa-mitsu.github.io/blog/posts/20220721_01/'>
