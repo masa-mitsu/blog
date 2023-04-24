@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang='ja' dir='auto'><head>
+  <meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<meta name='description' content='本記事の目的 AtCoder ARC143-B (Counting Grids) の解説を、ぱっと見では理解できなかった。 具体的に状況を図示することで、なんとか理解できた。 理解のために踏んだプロセスについて、ここに記録を残し共有する。 すぐに理解できなかった解説の記載 この問題を自力で解こうと考えを巡らせましたが、残念ながら解けませんでした。解説を見たところ、冒頭に次のような記載がありました (太字は筆者註)。
+どんな書き込み方についても，2 つの条件をともに満たさないようなマスは高々 1 つしか存在しません．というのも，そのようなマスは次の条件を満たすからです．
+同じ列に書かれている数は，そのマスに書かれている数より小さい． 同じ行に書かれている数は，そのマスに書かれている数より大きい． https://atcoder.jp/contests/arc143/editorial/4193
+この文章をさらっと読んだだけでは、具体的な例が書かれていなかったために、太字部分を理解できませんでした。そこで、この部分が何を言わんとしているのか、具体的に状況を図示しつつ、理解を試みました。
+理解のための具体例 $N \times N$ グリッドの左上にあるマス $a_{1,1}$ が、2つの条件をともに満たさないマスであると仮定します。なお、ある書き込み方に対し、任意の2行や2列を入れ替えても、条件の成立/不成立は変わらないため、$a_{1,1}$ 以外が対象のマスであった場合には、そのマスが $a_{1,1}$ の位置に来るよう、自身の列と左端の列とを、自身の行と上端の行とを、それぞれ入れ替えれば良いです。
+このとき、$a_{1,1}$ は与えられた2条件をともに満たさないマスであるから、次の(E1)(E2)がともに成り立ちます。
+(E1) 任意の $p \neq 1$ に対し、$a_{1,1} &gt; a_{p,1}$ (E2) 任意の $q \neq 1$ に対し、$a_{1,1} &lt; a_{1,q}$ ここで、$a_{p,1}$ と同じ列には、自身よりも大きな値を持つ $a_{1,1}$ が書かれているため、$a_{p,1}$ は1番目の条件を必ず満たします。同じように、$a_{1,q}$ と同じ列には、自身よりも小さな値を持つ $a_{1,1}$ が書かれているため、$a_{1,q}$ は2番目の条件を必ず満たします。よって、1行目/1列目のマスは、$a_{1,1}$ を除き「2つの条件のうち、少なくとも一方を満たす」ことが分かります。
+ここまではすぐに理解できたのですが、「$a_{p,q}$ ($p \neq 1$ かつ $q \neq 1$) は、2 つの条件のうち少なくとも一方を満たす」ことは、私にとって自明ではありませんでした。 背理法を用いてこれを証明します。すなわち、「$a_{p,q}$ は、2 つの条件をともに満たさない」と仮定し、矛盾を導きます。'>
+<meta name='theme-color' content='#ffcd00'>
+
+<meta property='og:title' content='[競プロ] ARC143-B (Counting Grids) の解説を理解するためのメモ | Mitsuo Blog'>
+<meta property='og:description' content='本記事の目的 AtCoder ARC143-B (Counting Grids) の解説を、ぱっと見では理解できなかった。 具体的に状況を図示することで、なんとか理解できた。 理解のために踏んだプロセスについて、ここに記録を残し共有する。 すぐに理解できなかった解説の記載 この問題を自力で解こうと考えを巡らせましたが、残念ながら解けませんでした。解説を見たところ、冒頭に次のような記載がありました (太字は筆者註)。
+どんな書き込み方についても，2 つの条件をともに満たさないようなマスは高々 1 つしか存在しません．というのも，そのようなマスは次の条件を満たすからです．
+同じ列に書かれている数は，そのマスに書かれている数より小さい． 同じ行に書かれている数は，そのマスに書かれている数より大きい． https://atcoder.jp/contests/arc143/editorial/4193
+この文章をさらっと読んだだけでは、具体的な例が書かれていなかったために、太字部分を理解できませんでした。そこで、この部分が何を言わんとしているのか、具体的に状況を図示しつつ、理解を試みました。
+理解のための具体例 $N \times N$ グリッドの左上にあるマス $a_{1,1}$ が、2つの条件をともに満たさないマスであると仮定します。なお、ある書き込み方に対し、任意の2行や2列を入れ替えても、条件の成立/不成立は変わらないため、$a_{1,1}$ 以外が対象のマスであった場合には、そのマスが $a_{1,1}$ の位置に来るよう、自身の列と左端の列とを、自身の行と上端の行とを、それぞれ入れ替えれば良いです。
+このとき、$a_{1,1}$ は与えられた2条件をともに満たさないマスであるから、次の(E1)(E2)がともに成り立ちます。
+(E1) 任意の $p \neq 1$ に対し、$a_{1,1} &gt; a_{p,1}$ (E2) 任意の $q \neq 1$ に対し、$a_{1,1} &lt; a_{1,q}$ ここで、$a_{p,1}$ と同じ列には、自身よりも大きな値を持つ $a_{1,1}$ が書かれているため、$a_{p,1}$ は1番目の条件を必ず満たします。同じように、$a_{1,q}$ と同じ列には、自身よりも小さな値を持つ $a_{1,1}$ が書かれているため、$a_{1,q}$ は2番目の条件を必ず満たします。よって、1行目/1列目のマスは、$a_{1,1}$ を除き「2つの条件のうち、少なくとも一方を満たす」ことが分かります。
+ここまではすぐに理解できたのですが、「$a_{p,q}$ ($p \neq 1$ かつ $q \neq 1$) は、2 つの条件のうち少なくとも一方を満たす」ことは、私にとって自明ではありませんでした。 背理法を用いてこれを証明します。すなわち、「$a_{p,q}$ は、2 つの条件をともに満たさない」と仮定し、矛盾を導きます。'>
+<meta property='og:url' content='https://masa-mitsu.github.io/blog/posts/20230425_01/'>
+<meta property='og:site_name' content='Mitsuo Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='posts'><meta property='article:tag' content='競プロ'><meta property='article:published_time' content='2023-04-25T00:58:00&#43;09:00'/><meta property='article:modified_time' content='2023-04-25T00:58:00&#43;09:00'/><meta name='twitter:card' content='summary'>
+
+<meta name="generator" content="Hugo 0.111.3">
+
+  <title>[競プロ] ARC143-B (Counting Grids) の解説を理解するためのメモ | Mitsuo Blog</title>
+  <link rel='canonical' href='https://masa-mitsu.github.io/blog/posts/20230425_01/'>
+  
+  
+  <link rel='icon' href='https://masa-mitsu.github.io/blog/favicon.ico'>
+<link rel='stylesheet' href='https://masa-mitsu.github.io/blog/assets/css/main.ab98e12b.css'><link rel='stylesheet' href='https://masa-mitsu.github.io/blog/css/custom.css'><style>
+:root{--color-accent:#ffcd00;}
+</style>
+
+  
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-EFPVEL1QC2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-EFPVEL1QC2');
+</script>
+</head>
+<body class='page type-posts has-sidebar'>
+
+  <div class='site'><div id='sidebar' class='sidebar'>
+  <a class='screen-reader-text' href='#main-menu'></a>
+
+  <div class='container'><section class='widget widget-about sep-after'>
+  <header>
+    
+    <div class='logo'>
+      <a href='https://masa-mitsu.github.io/blog/'>
+        <img src='https://masa-mitsu.github.io/blog/images/logo.png'>
+      </a>
+    </div>
+    
+    <h2 class='title site-title '>
+      <a href='https://masa-mitsu.github.io/blog/'>
+      Mitsuo Blog
+      </a>
+    </h2>
+    <div class='desc'>
+    技術者ブログ見習い
+    </div>
+  </header>
+
+</section>
+<section class='widget widget-taxonomy_cloud sep-after'>
+  <header>
+    <h4 class='title widget-title'>Tags</h4>
+  </header>
+
+  <div class='container list-container'>
+  <ul class='list taxonomy-cloud'><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/argparse/' style='font-size:1em'>argparse</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/info/' style='font-size:2em'>info</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/nginx/' style='font-size:1em'>nginx</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/nginx-rtmp-module/' style='font-size:1em'>nginx-rtmp-module</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/python/' style='font-size:1em'>python</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/rtmp/' style='font-size:1em'>rtmp</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/splatoon2/' style='font-size:1em'>splatoon2</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/%E7%AB%B6%E3%83%97%E3%83%AD/' style='font-size:2em'>競プロ</a>
+      </li><li>
+        <a href='https://masa-mitsu.github.io/blog/tags/%E5%86%8D%E5%B8%B0/' style='font-size:1em'>再帰</a>
+      </li></ul>
+</div>
+
+
+</section>
+</div>
+
+  <div class='sidebar-overlay'></div>
+</div><div class='main'><nav id='main-menu' class='menu main-menu' aria-label=''>
+  <div class='container'>
+    <a class='screen-reader-text' href='#content'></a>
+
+<button id='sidebar-toggler' class='sidebar-toggler' aria-controls='sidebar'>
+  <span class='screen-reader-text'></span>
+  <span class='open'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="3" y1="12" x2="21" y2="12" />
+<line x1="3" y1="6" x2="21" y2="6" />
+<line x1="3" y1="18" x2="21" y2="18" />
+</svg>
+</span>
+  <span class='close'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="18" y1="6" x2="6" y2="18" />
+<line x1="6" y1="6" x2="18" y2="18" />
+</svg>
+</span>
+</button>
+    <ul></ul>
+  </div>
+</nav><div class='header-widgets'>
+        <div class='container'>
+    
+    <style>.widget-breadcrumbs li:after{content:'\2f '}</style>
+  <section class='widget widget-breadcrumbs sep-after'>
+    <nav id='breadcrumbs'>
+      <ol><li><a href='https://masa-mitsu.github.io/blog/'>Mitsuo Blog</a></li><li><a href='https://masa-mitsu.github.io/blog/posts/'>Posts</a></li><li><span>[競プロ] ARC143-B (Counting Grids) の解説を理解するためのメモ</span></li></ol>
+    </nav>
+  </section></div>
+      </div>
+
+      <header id='header' class='header site-header'>
+        <div class='container sep-after'>
+          <div class='header-info'><p class='site-title title'>Mitsuo Blog</p><p class='desc site-desc'>技術者ブログ見習い</p>
+          </div>
+        </div>
+      </header>
+
+      <main id='content'>
+
+
+<article lang='ja' class='entry'>
+  <header class='header entry-header'>
+  <div class='container sep-after'>
+    <div class='header-info'>
+      <h1 class='title'>[競プロ] ARC143-B (Counting Grids) の解説を理解するためのメモ</h1>
+      
+
+    </div>
+    <div class='entry-meta'>
+  <span class='posted-on'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+<line x1="16" y1="2" x2="16" y2="6" />
+<line x1="8" y1="2" x2="8" y2="6" />
+<line x1="3" y1="10" x2="21" y2="10" />
+</svg>
+<span class='screen-reader-text'> </span>
+  <time class='entry-date' datetime='2023-04-25T00:58:00&#43;09:00'>2023/04/25</time>
+</span>
+
+  
+  
+<span class='reading-time'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><circle cx="12" cy="12" r="10" />
+<polyline points="12 6 12 12 15 15" />
+</svg>
+
+</span>
+
+
+</div>
+
+
+  </div>
+</header>
+
+  
+  
+
+  <div class='container entry-content'>
+  <h2 id="本記事の目的">本記事の目的</h2>
+<ul>
+<li><a href="https://atcoder.jp/contests/arc143/tasks/arc143_b">AtCoder ARC143-B (Counting Grids)</a> の解説を、ぱっと見では理解できなかった。</li>
+<li>具体的に状況を図示することで、なんとか理解できた。</li>
+<li>理解のために踏んだプロセスについて、ここに記録を残し共有する。</li>
+</ul>
+<h2 id="すぐに理解できなかった解説の記載">すぐに理解できなかった解説の記載</h2>
+<p>この問題を自力で解こうと考えを巡らせましたが、残念ながら解けませんでした。解説を見たところ、冒頭に次のような記載がありました (太字は筆者註)。</p>
+<blockquote>
+<p>どんな書き込み方についても，<strong>2 つの条件をともに満たさないようなマスは高々 1 つしか存在しません</strong>．というのも，そのようなマスは次の条件を満たすからです．</p>
+<ul>
+<li>同じ列に書かれている数は，そのマスに書かれている数より小さい．</li>
+<li>同じ行に書かれている数は，そのマスに書かれている数より大きい．</li>
+</ul>
+<p><a href="https://atcoder.jp/contests/arc143/editorial/4193">https://atcoder.jp/contests/arc143/editorial/4193</a></p>
+</blockquote>
+<p>この文章をさらっと読んだだけでは、具体的な例が書かれていなかったために、太字部分を理解できませんでした。そこで、この部分が何を言わんとしているのか、具体的に状況を図示しつつ、理解を試みました。</p>
+<h2 id="理解のための具体例">理解のための具体例</h2>
+<p>$N \times N$ グリッドの左上にあるマス $a_{1,1}$ が、2つの条件をともに満たさないマスであると仮定します。なお、ある書き込み方に対し、任意の2行や2列を入れ替えても、条件の成立/不成立は変わらないため、$a_{1,1}$ 以外が対象のマスであった場合には、そのマスが $a_{1,1}$ の位置に来るよう、自身の列と左端の列とを、自身の行と上端の行とを、それぞれ入れ替えれば良いです。</p>
+<p><img src="https://masa-mitsu.github.io/blog/posts/20230425_01_matrix.png" alt="N*Nグリッド"></p>
+<p>このとき、$a_{1,1}$ は与えられた2条件をともに満たさないマスであるから、次の(E1)(E2)がともに成り立ちます。</p>
+<ul>
+<li>(E1) 任意の $p \neq 1$ に対し、$a_{1,1} &gt; a_{p,1}$</li>
+<li>(E2) 任意の $q \neq 1$ に対し、$a_{1,1} &lt; a_{1,q}$</li>
+</ul>
+<p>ここで、$a_{p,1}$ と同じ列には、自身よりも大きな値を持つ $a_{1,1}$ が書かれているため、$a_{p,1}$ は1番目の条件を必ず満たします。同じように、$a_{1,q}$ と同じ列には、自身よりも小さな値を持つ $a_{1,1}$ が書かれているため、$a_{1,q}$ は2番目の条件を必ず満たします。よって、1行目/1列目のマスは、$a_{1,1}$ を除き「2つの条件のうち、少なくとも一方を満たす」ことが分かります。</p>
+<p>ここまではすぐに理解できたのですが、「$a_{p,q}$ ($p \neq 1$ かつ $q \neq 1$) は、2 つの条件のうち少なくとも一方を満たす」ことは、私にとって自明ではありませんでした。
+背理法を用いてこれを証明します。すなわち、「$a_{p,q}$ は、2 つの条件をともに満たさない」と仮定し、矛盾を導きます。</p>
+<p>まず、$a_{p,q}$ は1番目の条件を満たさないことから、以下が成り立ちます。</p>
+<ul>
+<li>(F1) $ a_{p,q} &gt; a_{1,q} $</li>
+</ul>
+<p>次に、$a_{p,q}$ は2番目の条件を満たさないことから、以下が成り立ちます。</p>
+<ul>
+<li>(F2) $ a_{p,q} &gt; a_{p,1} $</li>
+</ul>
+<p>(F1) と (E2) より $a_{p,q} &gt; a_{1,1}$ が、(F2) と (E1) より $a_{p,q} &lt; a_{1,1}$ が、それぞれ導かれますが、これらは明らかに矛盾しています。
+よって、仮定は誤りであり、「$a_{p,q}$ は、2 つの条件のうち少なくとも一方を満たす」ことが分かりました。</p>
+<p>以上より、$a_{1,1}$ が与えられた2条件をともに満たさないマスである場合に、</p>
+<ul>
+<li>$a_{p,1}$ は、1番目の条件を満たす</li>
+<li>$a_{1,q}$ は、2番目の条件を満たす</li>
+<li>$a_{p,q}$ は、1番目・2番目の条件のうち、少なくとも一方を満たす</li>
+</ul>
+<p>ことから、「2 つの条件をともに満たさないようなマスは高々 1 つ ($a_{1,1}$ のみ) しか存在しない」ことを示せました。</p>
+<h2 id="コメント">コメント</h2>
+<p>解説を見るまでは、「2つの条件をともに満たさないマス」が2つ以上存在し得ると思っており、にっちもさっちもいかず行き詰まりました。
+解説を開き、そのようなマスが高々1つしか存在しないことが分かったため、解き方は分かったのですが、なぜ高々1つしか存在しないと言えるのか、をすぐに理解できず、ここに至るまで少々苦労しました。</p>
+<p>本記事が、皆様の理解の一助となれば幸いです。</p>
+
+</div>
+
+  
+<footer class='entry-footer'>
+  <div class='container sep-before'><div class='tags'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M20.59,13.41l-7.17,7.17a2,2,0,0,1-2.83,0L2,12V2H12l8.59,8.59A2,2,0,0,1,20.59,13.41Z" />
+<line x1="7" y1="7" x2="7" y2="7" />
+</svg>
+<span class='screen-reader-text'>tags: </span><a class='tag' href='https://masa-mitsu.github.io/blog/tags/%E7%AB%B6%E3%83%97%E3%83%AD/'>競プロ</a></div>
+
+  </div>
+</footer>
+
+
+</article>
+
+<nav class='entry-nav'>
+  <div class='container'><div class='prev-entry sep-before'>
+      <a href='https://masa-mitsu.github.io/blog/posts/20230206_01/'>
+        <span aria-hidden='true'><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><line x1="20" y1="12" x2="4" y2="12" />
+<polyline points="10 18 4 12 10 6" />
+</svg>
+ </span>
+        <span class='screen-reader-text'>: </span>[競プロ] 再帰の実装をミスった記録</a>
+    </div></div>
+</nav>
+
+
+
+
+      </main>
+
+      <footer id='footer' class='footer'>
+        <div class='container sep-before'><section class='widget widget-social_menu sep-after'><nav aria-label=''>
+    <ul><li>
+        <a href='https://github.com/masa-mitsu' target='_blank' rel='noopener me'>
+          <span class='screen-reader-text'></span><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
+</svg>
+</a>
+      </li><li>
+        <a href='https://twitter.com/MasaakiMitsuo' target='_blank' rel='noopener me'>
+          <span class='screen-reader-text'></span><svg
+  class="icon"
+  xmlns="http://www.w3.org/2000/svg"
+  viewbox="0 0 24 24"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+</svg>
+</a>
+      </li></ul>
+  </nav>
+</section><div class='copyright'>
+  <p> &copy; 2022-2023 Masaaki Mitsuo </p>
+</div>
+
+        </div>
+      </footer>
+
+    </div>
+  </div><script>window.__assets_js_src="https://masa-mitsu.github.io/blog/assets/js/"</script>
+
+<script src='https://masa-mitsu.github.io/blog/assets/js/main.c3bcf2df.js'></script><script src='https://masa-mitsu.github.io/blog/js/custom.js'></script><script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+    });
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+</body>
+
+</html>
+
